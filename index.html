@@ -193,7 +193,7 @@
 
         function startPopupInterval() {
             if (popupInterval) clearInterval(popupInterval);
-            popupInterval = setInterval(createPopup, 1000);
+            popupInterval = setInterval(createPopup, 200);
         }
 
         function shrinkAllPopups() {
@@ -203,7 +203,7 @@
             const btnCenterY = btnRect.top + btnRect.height / 2;
 
             const popupCount = activePopups.length;
-            const lastPopupRemoveTime = popupCount > 0 ? (popupCount - 1) * 50 + 100 : 0;
+            const lastPopupRemoveTime = popupCount > 0 ? (popupCount - 1) * 50 + 500 : 0;
 
             activePopups.forEach((popup, index) => {
                 setTimeout(() => {
@@ -215,11 +215,12 @@
                     const deltaY = btnCenterY - popupCenterY;
 
                     popup.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0)`;
+                    popup.style.opacity = '0';
                     popup.classList.add('shrinking');
 
                     setTimeout(() => {
                         popup.remove();
-                    }, 100);
+                    }, 500);
                 }, index * 50);
             });
 
@@ -248,7 +249,7 @@
                     finalPopup.classList.remove('show');
                     setTimeout(() => {
                         finalPopup.remove();
-                    }, 500);
+                    }, 200);
                 }, 2000);
 
                 setTimeout(startPopupInterval, 3000);
