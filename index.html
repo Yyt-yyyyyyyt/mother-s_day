@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>母亲节快乐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe6f0 0%, #fff0f5 50%, #ffe6ec 100%);
+            overflow: hidden;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            position: relative;
+        }
+
+        .popup {
+            position: absolute;
+            padding: 8px 14px 8px 50px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(219, 154, 187, 0.4), 0 0 15px rgba(255, 182, 193, 0.6);
+            border: 1px solid rgba(255, 182, 193, 0.5);
+            font-size: 14px;
+            color: black;
+            cursor: default;
+            user-select: none;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            max-width: 280px;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .popup::before {
+            content: '💕';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            font-size: 18px;
+            z-index: 11;
+        }
+
+        .popup::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            max-height: calc(100% - 8px);
+            background-image: url('头像.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 2px;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+        }
+
+        .popup.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .popup.shrinking {
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            opacity: 0 !important;
+        }
+
+        .popup.final-message {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.3);
+            font-size: 18px;
+            color:rgb(219, 104, 162);
+            font-weight: bold;
+            padding: 14px 20px 14px 68px;
+        }
+
+        .popup.final-message.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .popup.final-message::after {
+            width: 48px;
+            height: 48px;
+            background-image: url('头像2.jpg');
+        }
+
+        .btn-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hint-text {
+            font-size: 12px;
+            color: rgba(78, 40, 59, 0.8);
+            background: rgba(255, 255, 255, 0.6);
+            padding: 4px 12px;
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            letter-spacing: 1px;
+        }
+
+        .receive-btn {
+            font-size: 48px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            user-select: none;
+            filter: drop-shadow(0 4px 12px rgba(255, 105, 180, 0.5));
+        }
+
+        .receive-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .receive-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="btn-container">
+        <div class="receive-btn floating" onclick="shrinkAllPopups()">💐</div>
+        <div class="hint-text">点击一下吧</div>
+    </div>
+
+    <script>
+        const blessings = [
+            "妈妈，祝你母亲节快乐(^з^)",
+            "妈妈我爱你！(●°u°●)",
+            "祝你身体健康，身材越来越好(≧∇≦)",
+            "祝你少生气，多多开心(⁎⁍̴̛ᴗ⁍̴̛⁎)",
+            "祝你事事顺意，好运连连！(≧∇≦)",
+            "祝你瑜伽课效果越来越明显！(●°u°●)"
+        ];
+
+        let activePopups = [];
+        let popupId = 0;
+        let popupInterval = null;
+
+        function createPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.id = 'popup-' + popupId++;
+            popup.textContent = blessings[Math.floor(Math.random() * blessings.length)];
+
+            const maxX = window.innerWidth - 320;
+            const maxY = window.innerHeight - 150;
+            const randomX = Math.max(20, Math.random() * maxX);
+            const randomY = Math.max(20, Math.random() * maxY);
+
+            popup.style.left = randomX + 'px';
+            popup.style.top = randomY + 'px';
+
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.classList.add('show');
+            }, 200);
+
+            activePopups.push(popup);
+        }
+
+        function startPopupInterval() {
+            if (popupInterval) clearInterval(popupInterval);
+            popupInterval = setInterval(createPopup, 1000);
+        }
+
+        function shrinkAllPopups() {
+            const btn = document.querySelector('.receive-btn');
+            const btnRect = btn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+
+            activePopups.forEach((popup, index) => {
+                setTimeout(() => {
+                    const popupRect = popup.getBoundingClientRect();
+                    const popupCenterX = popupRect.left + popupRect.width / 2;
+                    const popupCenterY = popupRect.top + popupRect.height / 2;
+
+                    const deltaX = btnCenterX - popupCenterX;
+                    const deltaY = btnCenterY - popupCenterY;
+
+                    popup.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0)`;
+                    popup.classList.add('shrinking');
+
+                    setTimeout(() => {
+                        popup.remove();
+                    }, 1000);
+                }, index * 100);
+            });
+
+            activePopups = [];
+            clearInterval(popupInterval);
+
+            btn.classList.remove('floating');
+            btn.textContent = '✨';
+            btn.style.filter = 'drop-shadow(0 4px 12px rgba(255, 223, 128, 0.7))';
+
+            setTimeout(() => {
+                btn.textContent = '💐';
+                btn.classList.add('floating');
+                btn.style.filter = 'drop-shadow(0 4px 12px rgba(255, 105, 180, 0.5))';
+
+                const finalPopup = document.createElement('div');
+                finalPopup.className = 'popup final-message';
+                finalPopup.textContent = '妈妈，祝你母亲节快乐，天天开心！';
+                document.body.appendChild(finalPopup);
+
+                setTimeout(() => {
+                    finalPopup.classList.add('show');
+                }, 100);
+
+                setTimeout(() => {
+                    finalPopup.classList.remove('show');
+                    setTimeout(() => {
+                        finalPopup.remove();
+                    }, 500);
+                }, 2000);
+
+                setTimeout(startPopupInterval, 1000);
+
+            }, 1000);
+        }
+
+        startPopupInterval();
+    </script>
+</body>
+</html>
